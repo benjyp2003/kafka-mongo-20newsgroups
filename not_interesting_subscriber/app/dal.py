@@ -7,7 +7,9 @@ class Dal:
         self.client = None
         self.db = None
         self.database_name = os.getenv("MONGO_DATABASE", "news-articles")
-        self.uri = "mongodb://localhost:27017/"
+        self.mongo_host = os.getenv("MONGO_HOST", "mongodb")
+        self.mongo_port = os.getenv("MONGO_PORT", "27017")
+        self.uri = f"mongodb://{self.mongo_host}:{self.mongo_port}/"
         self.collection_name = collection_name
 
 

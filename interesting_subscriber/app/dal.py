@@ -7,7 +7,9 @@ class Dal:
         self.client = None
         self.db = None
         self.database_name = os.getenv("MONGO_DATABASE", "news-articles")
-        self.uri = "mongodb://localhost:27017/"
+        self.mongo_host = os.getenv("MONGO_HOST", "mongodb")
+        self.mongo_port = os.getenv("MONGO_PORT", "27017")
+        self.uri = f"mongodb://{self.mongo_host}:{self.mongo_port}/"
         self.collection_name = collection_name
 
 
@@ -23,12 +25,12 @@ class Dal:
         except errors.PyMongoError as e:
             raise Exception(f"Error fetching docs from {collection} collection: {e}")
 
-    def insert_doc(self, doc):
+    def insert_doc(self, docs):
         try:
             with MongoClient(self.uri) as client:
                 self.db = client[self.database_name]
                 collection = self.db[self.collection_name]
-                collection.insert_one(doc)
+                collection.insert_one(docs)
 
         except errors.PyMongoError as e:
             raise Exception(f"Error inserting docs into {collection} collection: {e}")
