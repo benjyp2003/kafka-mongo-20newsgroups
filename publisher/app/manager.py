@@ -1,5 +1,5 @@
-from publisher.app.data_loader import DataLoader
-from publisher.app.kafka_producer import Producer
+from .data_loader import DataLoader
+from .kafka_producer import Producer
 
 
 class Manager:
@@ -22,7 +22,7 @@ class Manager:
                                         'rec.motorcycles',
                                         'rec.sport.baseball'
                                     ]
-        self.not_interesting_topic = [
+        self.not_interesting_categories = [
                                         'rec.sport.hockey',
                                         'sci.crypt',
                                         'sci.electronics',
@@ -57,7 +57,7 @@ class Manager:
     def extract_one_not_interesting_article_per_cat(self):
         not_interesting_articles = {}
 
-        for category in self.not_interesting_topic:
+        for category in self.not_interesting_categories:
             for article in self.not_interesting_data:
                 if article.get('category') == category and category not in not_interesting_articles:
                     not_interesting_articles[category] = article
@@ -68,3 +68,4 @@ class Manager:
     def publish(self):
         self.producer.publish(topic=self.interesting_topic, event=self.extract_one_interesting_article_per_cat())
         self.producer.publish(topic=self.not_interesting_topic, event=self.extract_one_not_interesting_article_per_cat())
+        self.producer.flush()

@@ -6,39 +6,36 @@ from .dal import Dal
 
 class Manager:
     def __init__(self):
-        self.consumer = Consumer
+        self.consumer = Consumer()
         self.dal = Dal()
 
-    def consume_messages(self, topic: str = "not-interesting_categories"):
-            try:
-                events = self.consumer.get_consumer_events(topic)
-                all_messages = []
-                for msg in events:
+    def process_messages(self, topic: str):
+        try:
+            event = self.consumer.get_consumer_events(topic)
+            for msg in event:
+                # msg.value contains the dictionary with 10 categories
+                categories_dict = msg.value
+
+                # Iterate through each category and save separately
+                for category_name, article_data in categories_dict.items():
                     doc = {
                         "topic": msg.topic,
                         "partition": msg.partition,
                         "offset": msg.offset,
                         "key": msg.key.decode("utf-8") if msg.key else None,
-                        "value": msg.value,
-                        "ts": datetime.now(timezone.utc),  # receipt timestamp (UTC, tz-aware)
+                        "category": category_name,
+                        "article": article_data,
+                        "time_stamp": datetime.now(timezone.utc),  # receipt timestamp (UTC, tz-aware)
                     }
-                    all_messages.append(doc)
+                    self.dal.insert_doc(doc)
 
-                return all_messages
+        except Exception as e:
+            raise Exception(f"Error consuming messages from topic {topic}: {e}")
 
-            except Exception as e:
-                raise Exception(f"Error consuming messages from topic {topic}: {e}")
-
-    def save_messages_to_db(self, messages: dict):
-            try:
-                for message in messages:
-                    self.dal.insert_doc(message)
-            except Exception as e:
-                raise Exception(f"Error saving messages to DB: {e}")
 
     def get_articles(self):
             try:
                 articles = self.dal.fetch_all_docs()
-                return articles
+                return {"articles": articles}
             except Exception as e:
-                raise Exception(f"Error retrieving articles from DB: {e}")
+                raise Exception(f"Error retrieving Non interesting articles from DB: {e}")
