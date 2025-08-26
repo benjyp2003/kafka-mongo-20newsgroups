@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException
 
-from publisher.app.manager import Manager
+from .manager import Manager
 
 
 app = FastAPI()
-MANAGER = None
+MANAGER = Manager()
 
 @app.get("/")
 async def read_root():
@@ -18,16 +18,8 @@ async def read_root():
 async def publish():
     try:
          MANAGER.publish()
+         return {"message": "Data published successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
 
-
-@app.on_event("startup")
-async def startup():
-    try:
-        print("Starting up the Publisher API")
-        global MANAGER
-        MANAGER = Manager()
-    except Exception as e:
-        print(f"Error during startup: {e}")
