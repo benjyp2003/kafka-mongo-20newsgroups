@@ -2,7 +2,7 @@ import json
 
 
 class DataLoader:
-     def __init__(self, interesting_file_path = "data/newsgroups_interesting.json", not_interesting_file_path = "data/newsgroups_not_interesting.json"):
+     def __init__(self, interesting_file_path = "app/data/newsgroups_interesting.json", not_interesting_file_path = "app/data/newsgroups_not_interesting.json"):
          self.interesting_file_path = interesting_file_path
          self.not_interesting_file_path = not_interesting_file_path
 
