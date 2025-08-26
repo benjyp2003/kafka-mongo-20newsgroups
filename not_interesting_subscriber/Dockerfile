@@ -13,4 +13,4 @@ COPY . .
 EXPOSE 8002
 
 WORKDIR /app
-CMD ["uvicorn", "not_interesting_subscriber.app.main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002"]
