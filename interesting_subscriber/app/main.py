@@ -1,4 +1,4 @@
-
+import threading
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -19,19 +19,19 @@ async def read_root():
 @app.get("/get_interesting_articles", response_model=Articles)
 async def get_interesting_articles() -> Articles:
     try:
-        if manager is None:
-            raise HTTPException(status_code=500, detail="Manager not initialized")
         return manager.get_articles()
     except HTTPException as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving interresting articles data: {str(e)}")
+
 
 @app.on_event("startup")
 async def startup_event():
     try:
         print("Interesting Subscriber Service is starting up...")
-        global manager
-        if manager is None:
-            manager = Manager()
+
+        t = threading.Thread(target=manager.process_messages, args=["interesting_categories"], daemon=True)
+        t.start()
+        print("Started consuming messages...")
 
     except HTTPException as e:
         print(f"HTTP error during startup: {e}")
